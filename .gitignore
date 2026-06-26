@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+venv/
+.env
+
+# Streamlit
+.streamlit/
+
+# Database
+*.db
+
+# ChromaDB
+data/chroma/
+
+# Uploaded Files
+uploads/
+
+# Logs
+logs/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

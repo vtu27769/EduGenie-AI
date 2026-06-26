@@ -1,0 +1,206 @@
+/* Custom CSS for EduGenie AI - Premium Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Color Variables */
+:root {
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --accent-blue: #3B82F6;
+    --accent-green: #10B981;
+    --accent-red: #EF4444;
+    --accent-purple: #8B5CF6;
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Global resets & font family */
+html, body, [class*="css"], .stMarkdown, p, span, label, input, button, select, textarea {
+    font-family: 'Outfit', sans-serif !important;
+    color: var(--text-main);
+}
+
+/* Custom gradients & styling for titles */
+.main-title {
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #10B981 100%);
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    margin-bottom: 0.5rem !important;
+    text-align: center !important;
+    letter-spacing: -0.05em !important;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.subtitle {
+    font-size: 1.25rem !important;
+    color: var(--text-muted) !important;
+    text-align: center !important;
+    margin-bottom: 2.5rem !important;
+    font-weight: 300 !important;
+    line-height: 1.6 !important;
+}
+
+/* Premium Card Designs (Glassmorphism) */
+.feature-card {
+    background: rgba(30, 41, 59, 0.45) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1.2rem !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px) !important;
+    border-color: rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 12px 40px 0 rgba(139, 92, 246, 0.15) !important;
+}
+
+.card-title {
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    color: #8B5CF6 !important;
+    margin-bottom: 0.6rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    letter-spacing: -0.02em !important;
+}
+
+.card-text {
+    font-size: 0.92rem !important;
+    color: #CBD5E1 !important;
+    line-height: 1.6 !important;
+}
+
+/* Sidebar Custom Styling */
+section[data-testid="stSidebar"] {
+    background-color: #0B0F19 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+section[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] h2 {
+    color: #8B5CF6 !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
+}
+
+/* Custom button accent */
+div.stButton > button {
+    background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 0.6rem 1.8rem !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: -0.01em !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2) !important;
+    transition: all 0.2s ease !important;
+    width: 100% !important;
+}
+
+div.stButton > button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(139, 92, 246, 0.35) !important;
+    opacity: 0.95 !important;
+}
+
+div.stButton > button:active {
+    transform: translateY(1px) !important;
+}
+
+/* Text inputs, selectboxes, textareas styling overrides */
+input[type="text"], input[type="password"], textarea, select {
+    background-color: rgba(30, 41, 59, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-main) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 0.8rem !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25) !important;
+    outline: none !important;
+}
+
+/* Metrics stats overrides */
+div[data-testid="stMetricValue"] {
+    font-weight: 700 !important;
+    font-size: 2rem !important;
+    color: #3B82F6 !important;
+}
+
+div[data-testid="stMetricLabel"] {
+    color: var(--text-muted) !important;
+    font-weight: 500 !important;
+}
+
+/* Tabs customization */
+button[data-baseweb="tab"] {
+    color: var(--text-muted) !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    border-bottom-width: 2px !important;
+    transition: color 0.2s ease !important;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #8B5CF6 !important;
+    border-bottom-color: #8B5CF6 !important;
+    font-weight: 600 !important;
+}
+
+/* Beautiful custom scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.4);
+}
+
+/* Interactive custom indicators */
+.status-badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+    margin-right: 0.5rem;
+}
+
+.badge-active {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-inactive {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
