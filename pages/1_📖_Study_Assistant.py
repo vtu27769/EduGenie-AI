@@ -134,69 +134,70 @@ if api_key_valid:
             
             # Display Chat Messages
            # Display Chat Messages (Custom UI without avatars)
+                        # Display Chat Messages (Custom UI)
 
-chat_history = get_chat_history(user_id)
+            chat_history = get_chat_history(user_id)
 
-st.markdown("""
-<style>
-.user-message {
-    background: #1e293b;
-    color: white;
-    padding: 14px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    border-left: 4px solid #38bdf8;
-}
+            st.markdown("""
+            <style>
+            .user-message {
+                background: #1e293b;
+                color: white;
+                padding: 14px;
+                border-radius: 12px;
+                margin-bottom: 10px;
+                border-left: 4px solid #38bdf8;
+            }
 
-.assistant-message {
-    background: #0f172a;
-    color: white;
-    padding: 14px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    border-left: 4px solid #10b981;
-}
+            .assistant-message {
+                background: #0f172a;
+                color: white;
+                padding: 14px;
+                border-radius: 12px;
+                margin-bottom: 10px;
+                border-left: 4px solid #10b981;
+            }
 
-.message-title {
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-</style>
-""", unsafe_allow_html=True)
+            .message-title {
+                font-weight: bold;
+                margin-bottom: 6px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
 
-for msg in chat_history:
+            for msg in chat_history:
 
-    if msg["is_user"] == 1:
+                if msg["is_user"] == 1:
 
-        st.markdown(
-            f"""
-            <div class="user-message">
-                <div class="message-title">
-                    👤 You
-                </div>
-                <div>
-                    {msg["message"]}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                    st.markdown(
+                        f"""
+                        <div class="user-message">
+                            <div class="message-title">
+                                👤 You
+                            </div>
+                            <div>
+                                {msg["message"]}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
-    else:
+                else:
 
-        st.markdown(
-            f"""
-            <div class="assistant-message">
-                <div class="message-title">
-                    🧞 EduGenie AI
-                </div>
-                <div>
-                    {msg["message"]}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+                    st.markdown(
+                        f"""
+                        <div class="assistant-message">
+                            <div class="message-title">
+                                🧞 EduGenie AI
+                            </div>
+                            <div>
+                                {msg["message"]}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
             
             # Form or Chat Input
             user_question = st.text_input(
