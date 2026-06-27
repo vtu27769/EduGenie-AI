@@ -18,6 +18,14 @@ class QuizQuestionSchema(BaseModel):
 class QuizSchema(BaseModel):
     questions: List[QuizQuestionSchema]
 
+# Pydantic schemas for structured flashcard generation
+class FlashcardSchema(BaseModel):
+    question: str = Field(description="A clear, concise question testing a key concept from the context.")
+    answer: str = Field(description="A concise, accurate answer to the question based on the context.")
+
+class FlashcardsListSchema(BaseModel):
+    flashcards: List[FlashcardSchema]
+
 class LLMService:
     """
     Service layer for communicating with Google Gemini using LangChain.
@@ -188,3 +196,107 @@ class LLMService:
             logger.error(f"Error generating structured quiz: {e}", exc_info=True)
             # If structured output fails, log error and raise
             raise RuntimeError(f"Failed to generate structured quiz: {str(e)}")
+
+    def generate_flashcards_structured(self, context: str, num_cards: int = 10) -> FlashcardsListSchema:
+        """
+        Generates structured flashcards from the provided context using Gemini.
+        """
+        if not context.strip():
+            raise ValueError("Context cannot be empty for flashcard generation.")
+
+        try:
+            logger.info(f"Generating {num_cards} structured flashcards using Gemini structured output...")
+            llm = self._get_llm()
+            
+            # Request structured output using langchain interface
+            structured_llm = llm.with_structured_output(FlashcardsListSchema)
+            
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", (
+                    "You are an expert tutor. "
+                    "Extract key concepts, definitions, and important questions from the provided context. "
+                    "Create exactly {num_cards} flashcards. "
+                    "Each flashcard must contain a question and a clear, accurate, concise answer."
+                )),
+                ("user", "Generate flashcards from this context:\n\n{context}")
+            ])
+            
+            chain = prompt | structured_llm
+            response = chain.invoke({"context": context, "num_cards": num_cards})
+            return response
+        except Exception as e:
+            logger.error(f"Error generating structured flashcards: {e}", exc_info=True)
+            raise RuntimeError(f"Failed to generate structured flashcards: {str(e)}")
+    def generate_study_plan(
+    self,
+    subject: str,
+    exam_date: str,
+    daily_hours: float,
+    difficulty: str,
+    goals: str
+) -> str:
+    """
+    Generates a personalized AI study plan.
+    """
+
+    try:
+        logger.info("Generating AI Study Plan...")
+
+        llm = self._get_llm()
+
+        prompt = ChatPromptTemplate.from_messages([
+            (
+                "system",
+                """
+                You are EduGenie AI, an expert academic mentor.
+
+                Create a detailed and realistic study plan.
+
+                Include:
+
+                1. Study Overview
+                2. Weekly Goals
+                3. Daily Schedule
+                4. Important Topics
+                5. Revision Strategy
+                6. Exam Preparation Tips
+                7. Time Management Advice
+
+                Format everything using clean Markdown.
+
+                Make the plan practical and achievable.
+                """
+            ),
+            (
+                "user",
+                """
+                Subject: {subject}
+
+                Exam Date: {exam_date}
+
+                Daily Study Hours: {daily_hours}
+
+                Difficulty Level: {difficulty}
+
+                Goals: {goals}
+
+                Create a complete study plan.
+                """
+            )
+        ])
+
+        chain = prompt | llm
+
+        response = chain.invoke({
+            "subject": subject,
+            "exam_date": exam_date,
+            "daily_hours": daily_hours,
+            "difficulty": difficulty,
+            "goals": goals
+        })
+
+        return response.content
+
+    except Exception as e:
+        logger.error(f"Study plan generation failed: {e}", exc_info=True)
+        raise RuntimeError(f"Failed to generate study plan: {str(e)}")

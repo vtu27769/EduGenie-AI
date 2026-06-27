@@ -316,7 +316,7 @@ else:
     with dash_col_right:
         st.markdown("### 🎓 Quick Study Navigation")
         
-        nav_1, nav_2 = st.columns(2)
+        nav_1, nav_2, nav_3 = st.columns(3)
         with nav_1:
             st.markdown("""
             <div class="feature-card" style="min-height: 120px;">
@@ -340,6 +340,18 @@ else:
             """, unsafe_allow_html=True)
             if st.button("Go to Quiz Generator", use_container_width=True):
                 st.switch_page("pages/2_📝_Quiz_Generator.py")
+
+        with nav_3:
+            st.markdown("""
+            <div class="feature-card" style="min-height: 120px;">
+                <div class="card-title">🃏 AI Flashcards</div>
+                <div style="font-size: 0.85rem; color: #e0e0e0; margin-bottom: 0.8rem;">
+                    Generate and review active recall cards to boost retention.
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Go to AI Flashcards", use_container_width=True):
+                st.switch_page("pages/4_🃏_AI_Flashcards.py")
                 
         st.write("#### 📊 Recent Quiz Activity")
         if total_quizzes > 0:

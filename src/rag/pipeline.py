@@ -172,3 +172,41 @@ class RAGPipeline:
             logger.error(f"Failed to generate structured quiz: {e}", exc_info=True)
             raise RuntimeError(f"Failed to generate structured quiz: {str(e)}")
 
+    def generate_and_save_flashcards(self, user_id: int, document_name: str, num_cards: int = 10) -> int:
+        """
+        Generates structured flashcards from active document text, stores them in SQLite db,
+        and returns count of cards generated.
+        """
+        if not self.current_pdf_path:
+            raise ValueError("No active PDF has been indexed. Please index a PDF first.")
+
+        try:
+            logger.info(f"Generating flashcards for active PDF: {self.current_pdf_path.name}")
+            
+            # Extract text of the active PDF
+            full_text = extract_text_from_pdf(self.current_pdf_path)
+            
+            if not full_text:
+                raise ValueError("Could not read content from the active PDF.")
+
+            # Generate using LLM Service
+            structured_data = self.llm_service.generate_flashcards_structured(full_text, num_cards)
+            
+            if not structured_data or not structured_data.flashcards:
+                raise ValueError("LLM failed to return structured flashcards.")
+
+            # Clear existing flashcards for this user and document to prevent accumulation on regeneration
+            from src.database.db_manager import delete_all_flashcards, add_flashcard
+            delete_all_flashcards(user_id, document_name)
+            
+            count = 0
+            for card in structured_data.flashcards:
+                if add_flashcard(user_id, document_name, card.question, card.answer):
+                    count += 1
+            
+            logger.info(f"Successfully generated and saved {count} flashcards for '{document_name}'")
+            return count
+        except Exception as e:
+            logger.error(f"Failed to generate and save flashcards: {e}", exc_info=True)
+            raise RuntimeError(f"Failed to generate and save flashcards: {str(e)}")
+
