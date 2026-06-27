@@ -6,6 +6,7 @@ langchain-huggingface>=0.0.1
 langchain-google-genai>=1.0.0
 chromadb>=0.5.0
 sentence-transformers>=3.0.0
+streamlit-cookies-controller
 sqlalchemy>=2.0.0
 python-dotenv>=1.0.1
 pypdf>=4.2.0
