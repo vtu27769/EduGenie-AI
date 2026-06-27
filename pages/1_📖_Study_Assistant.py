@@ -50,10 +50,10 @@ total_docs = len(user_docs)
 with st.sidebar:
     st.image("https://img.icons8.com/clouds/200/genie.png", width=100)
     st.header("EduGenie AI")
-    st.caption(f"👤 User: {username}")
+    st.caption(f" User: {username}")
     st.markdown("---")
     
-    st.subheader("📁 Study Library")
+    st.subheader(" Study Library")
     if total_docs > 0:
         doc_options = [doc["file_name"] for doc in user_docs]
         
@@ -133,14 +133,70 @@ if api_key_valid:
             st.write("### Ask Questions About Your Material")
             
             # Display Chat Messages
-            chat_history = get_chat_history(user_id)
-            chat_container = st.container()
-            
-            with chat_container:
-                for msg in chat_history:
-                    role = "user" if msg["is_user"] == 1 else "assistant"
-                    with st.chat_message(role):
-                        st.markdown(msg["message"])
+           # Display Chat Messages (Custom UI without avatars)
+
+chat_history = get_chat_history(user_id)
+
+st.markdown("""
+<style>
+.user-message {
+    background: #1e293b;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #38bdf8;
+}
+
+.assistant-message {
+    background: #0f172a;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border-left: 4px solid #10b981;
+}
+
+.message-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+for msg in chat_history:
+
+    if msg["is_user"] == 1:
+
+        st.markdown(
+            f"""
+            <div class="user-message">
+                <div class="message-title">
+                    👤 You
+                </div>
+                <div>
+                    {msg["message"]}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    else:
+
+        st.markdown(
+            f"""
+            <div class="assistant-message">
+                <div class="message-title">
+                    🧞 EduGenie AI
+                </div>
+                <div>
+                    {msg["message"]}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
             
             # Form or Chat Input
             user_question = st.text_input(
