@@ -228,75 +228,80 @@ class LLMService:
             logger.error(f"Error generating structured flashcards: {e}", exc_info=True)
             raise RuntimeError(f"Failed to generate structured flashcards: {str(e)}")
     def generate_study_plan(
-    self,
-    subject: str,
-    exam_date: str,
-    daily_hours: float,
-    difficulty: str,
-    goals: str
-) -> str:
-    """
-    Generates a personalized AI study plan.
-    """
+        self,
+        subject: str,
+        exam_date: str,
+        daily_hours: float,
+        difficulty: str,
+        goals: str
+    ) -> str:
+        """
+        Generates a personalized AI study plan.
+        """
 
-    try:
-        logger.info("Generating AI Study Plan...")
+        try:
+            logger.info("Generating AI Study Plan...")
 
-        llm = self._get_llm()
+            llm = self._get_llm()
 
-        prompt = ChatPromptTemplate.from_messages([
-            (
-                "system",
-                """
-                You are EduGenie AI, an expert academic mentor.
+            prompt = ChatPromptTemplate.from_messages([
+                (
+                    "system",
+                    """
+                    You are EduGenie AI, an expert academic mentor.
 
-                Create a detailed and realistic study plan.
+                    Create a detailed and realistic study plan.
 
-                Include:
+                    Include:
 
-                1. Study Overview
-                2. Weekly Goals
-                3. Daily Schedule
-                4. Important Topics
-                5. Revision Strategy
-                6. Exam Preparation Tips
-                7. Time Management Advice
+                    1. Study Overview
+                    2. Weekly Goals
+                    3. Daily Schedule
+                    4. Important Topics
+                    5. Revision Strategy
+                    6. Exam Preparation Tips
+                    7. Time Management Advice
 
-                Format everything using clean Markdown.
+                    Format everything using clean Markdown.
 
-                Make the plan practical and achievable.
-                """
-            ),
-            (
-                "user",
-                """
-                Subject: {subject}
+                    Make the plan practical and achievable.
+                    """
+                ),
+                (
+                    "user",
+                    """
+                    Subject: {subject}
 
-                Exam Date: {exam_date}
+                    Exam Date: {exam_date}
 
-                Daily Study Hours: {daily_hours}
+                    Daily Study Hours: {daily_hours}
 
-                Difficulty Level: {difficulty}
+                    Difficulty Level: {difficulty}
 
-                Goals: {goals}
+                    Goals: {goals}
 
-                Create a complete study plan.
-                """
+                    Create a complete study plan.
+                    """
+                )
+            ])
+
+            chain = prompt | llm
+
+            response = chain.invoke({
+                "subject": subject,
+                "exam_date": exam_date,
+                "daily_hours": daily_hours,
+                "difficulty": difficulty,
+                "goals": goals
+            })
+
+            return response.content
+
+        except Exception as e:
+            logger.error(
+                f"Study plan generation failed: {e}",
+                exc_info=True
             )
-        ])
-
-        chain = prompt | llm
-
-        response = chain.invoke({
-            "subject": subject,
-            "exam_date": exam_date,
-            "daily_hours": daily_hours,
-            "difficulty": difficulty,
-            "goals": goals
-        })
-
-        return response.content
-
-    except Exception as e:
-        logger.error(f"Study plan generation failed: {e}", exc_info=True)
-        raise RuntimeError(f"Failed to generate study plan: {str(e)}")
+            raise RuntimeError(
+                f"Failed to generate study plan: {str(e)}"
+            )
