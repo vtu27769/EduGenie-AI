@@ -2,9 +2,11 @@ import logging
 import os
 from typing import List
 from pydantic import BaseModel, Field
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
+from dotenv import load_dotenv
 
+load_dotenv()
 # Set up logger
 logger = logging.getLogger(__name__)
 
@@ -37,25 +39,26 @@ class LLMService:
         self.temperature = temperature
         logger.info("LLMService initialized with lazy client creation.")
 
-    def _get_llm(self) -> ChatGoogleGenerativeAI:
-        """
-        Retrieves the LLM client initialized dynamically with the latest API key in environment.
-        """
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key or api_key == "YOUR_GEMINI_API_KEY" or not api_key.strip():
-            logger.error("Attempted to initialize LLM with missing or placeholder API Key.")
+     def _get_llm(self):
+    """
+    Creates Azure OpenAI client.
+    """
+
+        endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_key = os.getenv("AZURE_OPENAI_API_KEY")
+
+        if not endpoint or not api_key:
             raise ValueError(
-                "Google Gemini API Key is missing or invalid. "
-                "Please configure your key in the Settings page to activate AI operations."
-            )
-        
-        logger.info("Initializing ChatGoogleGenerativeAI client dynamically...")
-        return ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            google_api_key=api_key,
-            temperature=self.temperature,
-            max_retries=2
-        )
+                "Azure OpenAI credentials not configured."
+    
+                )
+
+        return AzureChatOpenAI(
+            azure_endpoint=endpoint,
+            api_key=api_key,
+            deployment_name="gpt-5-mini",
+            temperature=self.temperature
+    )
 
     def generate_answer(self, question: str, context: str) -> str:
         """
@@ -72,7 +75,7 @@ class LLMService:
             raise ValueError("Question cannot be empty.")
 
         try:
-            logger.info("Generating answer using Gemini...")
+            logger.info("Generating answer using Azure OpenAI...")
             llm = self._get_llm()
             prompt = ChatPromptTemplate.from_messages([
                 ("system", (
@@ -106,7 +109,7 @@ class LLMService:
             raise ValueError("Context cannot be empty for notes generation.")
 
         try:
-            logger.info("Generating study notes using Gemini...")
+            logger.info("Generating study notes using Azure OpenAI...")
             llm = self._get_llm()
             prompt = ChatPromptTemplate.from_messages([
                 ("system", (
@@ -172,7 +175,7 @@ class LLMService:
             raise ValueError("Context cannot be empty for quiz generation.")
 
         try:
-            logger.info(f"Generating {num_questions} structured quiz questions using Gemini structured output...")
+            logger.info(f"Generating {num_questions} structured quiz questions using Azure OpenAI structured output...")
             llm = self._get_llm()
             
             # Request structured output using langchain interface
