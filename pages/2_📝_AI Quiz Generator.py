@@ -40,9 +40,10 @@ try:
     validate_config()
 except ValueError as e:
     api_key_valid = False
-    st.warning("⚠️ Configuration Alert: Google Gemini API Key is missing.")
-    st.info("Please navigate to the ⚙️ Settings page or sidebar to configure your credentials.")
-
+    st.warning("⚠️ Azure OpenAI configuration is incomplete.")
+    st.info(
+        "Please configure Azure OpenAI Endpoint, API Key, Deployment Name, and API Version in Settings."
+    )
 # 3. Retrieve user documents
 user_docs = get_user_documents(user_id)
 total_docs = len(user_docs)
@@ -248,4 +249,6 @@ if api_key_valid:
     else:
         st.info("👋 No active study document loaded. Please upload a PDF or select an active document in the sidebar study library.")
 else:
-    st.error("Please configure the API key in the settings page to generate quizzes.")
+    st.error(
+    "Please configure Azure OpenAI credentials in Settings before generating quizzes."
+    )

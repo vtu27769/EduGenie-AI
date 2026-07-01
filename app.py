@@ -11,6 +11,8 @@ from src.database.db_manager import (
 )
 from src.utils.auth_helper import init_auth, logout_user
 from streamlit_cookies_controller import CookieController
+import sys
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -18,8 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize database schema
 init_db()
-from src.database.db_manager import create_default_admin
-create_default_admin()
+
 # Configure page settings
 st.set_page_config(
     page_title="EduGenie AI - Intelligent Study Dashboard",
@@ -69,7 +70,6 @@ if not st.session_state.logged_in:
                             st.session_state.logged_in = True
                             st.session_state.user_id = user["id"]
                             st.session_state.username = user["username"]
-                            st.session_state.role = user.get("role", "user")
                             # Initialize RAG pipeline
                             from src.rag.pipeline import RAGPipeline
                             if "pipeline" not in st.session_state:
@@ -172,7 +172,7 @@ else:
             st.session_state.pipeline = RAGPipeline()
         except Exception as e:
             logger.error(f"Failed to initialize the RAG system: {e}")
-            st.error("RAG pipeline failed to initialize. Gemini features might be unavailable.")
+            st.error("RAG pipeline failed to initialize. Azure features might be unavailable.")
 
     user_id = st.session_state.user_id
     username = st.session_state.username
@@ -230,14 +230,9 @@ else:
         st.write("Upload course syllabi, lecture slides, notes, or books (PDF) to build your personalized RAG knowledge base.")
         
         # Check API key configuration status
+    
+
         api_key_valid = True
-        try:
-            validate_config()
-        except ValueError:
-            api_key_valid = False
-            st.warning("⚠️ API Credentials Missing: Gemini features are locked.")
-            st.info("Navigate to the **Settings** page or sidebar link to add your Google API key.")
-            
         if api_key_valid:
             # File Uploader
             dashboard_file = st.file_uploader(
@@ -328,7 +323,7 @@ else:
             </div>
             """, unsafe_allow_html=True)
             if st.button("Go to Study Assistant", use_container_width=True):
-                st.switch_page("pages/1_📖_Study_Assistant.py")
+                st.switch_page("pages/1_📖_AI Tutor.py")
                 
         with nav_2:
             st.markdown("""
@@ -340,7 +335,7 @@ else:
             </div>
             """, unsafe_allow_html=True)
             if st.button("Go to Quiz Generator", use_container_width=True):
-                st.switch_page("pages/2_📝_Quiz_Generator.py")
+                st.switch_page("pages/2_📝_AI Quiz Generator.py")
 
         with nav_3:
             st.markdown("""
@@ -352,7 +347,7 @@ else:
             </div>
             """, unsafe_allow_html=True)
             if st.button("Go to AI Flashcards", use_container_width=True):
-                st.switch_page("pages/4_🃏_AI_Flashcards.py")
+                st.switch_page("pages/3_🃏_AI Flashcards.py")
                 
         st.write("#### 📊 Recent Quiz Activity")
         if total_quizzes > 0:
@@ -387,9 +382,7 @@ else:
     with st.sidebar:
         st.image("https://img.icons8.com/clouds/200/genie.png", width=100)
         st.markdown(f"## EduGenie Dashboard")
-        role = st.session_state.get("role", "user")
         st.markdown(f"👤 **User:** `{username}`")
-        st.markdown(f"🛡️ **Role:** `{role}`")
         
         # Display Active Document
         active_doc = st.session_state.get("active_document_name")
@@ -413,7 +406,7 @@ else:
         st.markdown("---")
         
         if st.button("⚙️ Application Settings", use_container_width=True):
-            st.switch_page("pages/3_⚙️_Settings.py")
+            st.switch_page("pages/Settings.py")
             
         if st.button("🚪 Log Out", use_container_width=True):
             logout_user()

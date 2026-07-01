@@ -3,7 +3,7 @@ import streamlit as st
 from pathlib import Path
 from src.config import CHROMA_DB_DIR, SQLITE_DB_PATH, BASE_DIR
 from src.database.db_manager import get_user_documents
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import AzureChatOpenAI
 from src.utils.auth_helper import require_login, logout_user
 
 # 1. Protect page - Redirect to login if unauthorized
@@ -69,8 +69,8 @@ with st.sidebar:
     st.markdown("---")
     if st.button("📊 Go to Dashboard", use_container_width=True):
         st.switch_page("app.py")
-    if st.button("📖 Study Assistant", use_container_width=True):
-        st.switch_page("pages/1_📖_Study_Assistant.py")
+    if st.button("📖 AI Tutor", use_container_width=True):
+        st.switch_page("pages/1_📖_AI Tutor.py")
     if st.button("🚪 Logout", use_container_width=True):
         logout_user()
 
@@ -78,33 +78,60 @@ with st.sidebar:
 col_left, col_right = st.columns([2, 1])
 
 # Fetch API Key
-current_key = os.getenv("GOOGLE_API_KEY")
-if not current_key or current_key == "YOUR_GEMINI_API_KEY":
+current_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+current_key = os.getenv("AZURE_OPENAI_API_KEY", "")
+current_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT", "")
+current_api_version = os.getenv("AZURE_OPENAI_API_VERSION", "")
+st.write("Current deployment from env:", repr(current_deployment))
+st.write("Current API version from env:", repr(current_api_version))
+if not current_key or current_key == "YOUR_AZURE_OPENAI_API_KEY":
     current_key = ""
 has_key = bool(current_key.strip())
 
 with col_left:
-    st.write("### 🔑 Google Gemini API Credentials")
+    st.write("### 🔑 Azure  API Credentials")
     
     # Key input (obfuscated)
-    new_key = st.text_input(
-        "Google Gemini API Key:",
-        value=current_key,
-        type="password",
-        placeholder="Enter your AI Studio API key...",
-        help="Obtain an API key from Google AI Studio (https://aistudio.google.com/)"
+    endpoint = st.text_input(
+        "Azure OpenAI Endpoint",
+        value=current_endpoint
     )
-    
+
+    api_key = st.text_input(
+        "Azure OpenAI API Key",
+        value=current_key,
+        type="password"
+    )
+
+    deployment = st.text_input(
+        "Deployment Name",
+        value=current_deployment
+    )
+    st.write("Deployment field value:", repr(deployment))
+    current_api_version = os.getenv(
+        "AZURE_OPENAI_API_VERSION",
+        "2024-10-21"
+    )
+
+    api_version = st.text_input(
+        "Azure OpenAI API Version",
+        value=current_api_version
+    )
     if st.button("Save Credentials", key="btn_save_settings", use_container_width=True):
         try:
             # Update running environment variable
-            os.environ["GOOGLE_API_KEY"] = new_key
-            
+            os.environ["AZURE_OPENAI_ENDPOINT"] = endpoint
+            os.environ["AZURE_OPENAI_API_KEY"] = api_key
+            os.environ["AZURE_OPENAI_DEPLOYMENT"] = deployment
+            os.environ["AZURE_OPENAI_API_VERSION"] = api_version
             # Write to .env file in root directory for persistence
             env_file_path = BASE_DIR / ".env"
             with open(env_file_path, "w", encoding="utf-8") as f:
-                f.write(f"GOOGLE_API_KEY={new_key}\n")
-                
+                f.write(f"AZURE_OPENAI_ENDPOINT={endpoint}\n")
+                f.write(f"AZURE_OPENAI_API_KEY={api_key}\n")
+                f.write(f"AZURE_OPENAI_DEPLOYMENT={deployment}\n")
+                f.write(f"AZURE_OPENAI_API_VERSION={api_version}\n")
+
             st.success("✅ Credentials saved and persisted successfully! Environment refreshed.")
             st.rerun()
         except Exception as e:
@@ -129,25 +156,31 @@ with col_right:
     st.write("### 🔍 Application Status")
     
     # 1. API Status
-    st.write("**Gemini API Key Status:**")
+    st.write("**Azure OpenAI API Key Status:**")
     if has_key:
         st.markdown("<span style='color:#6BCB77; font-weight:bold;'>Configured Key Found ✅</span>", unsafe_allow_html=True)
         
         # Test connection button
         if st.button("Test Connection", key="btn_test_api", use_container_width=True):
-            with st.spinner("Testing communication with Gemini API..."):
+            with st.spinner("Testing communication with Azure OpenAI..."):
                 try:
-                    # Make a simple test request
-                    test_llm = ChatGoogleGenerativeAI(
-                        model="gemini-2.5-flash",
-                        google_api_key=current_key,
-                        temperature=0.2
+                    test_llm = AzureChatOpenAI(
+                        azure_endpoint=endpoint,
+                        api_key=api_key,
+                        api_version=api_version,
+                        deployment_name=deployment,
+                
                     )
-                    # Invoke a simple prompt to test the model
-                    test_llm.invoke("Say connection successful in 3 words")
-                    st.success("🎉 Success: Connected to Google Gemini API!")
+
+                    response = test_llm.invoke("Reply with OK")
+
+                    st.success(
+                    f"🎉 Connected successfully! Response: {response.content}"
+                    )
+
                 except Exception as e:
                     st.error(f"Failed connection: {e}")
+            
     else:
         st.markdown("<span style='color:#FF6B6B; font-weight:bold;'>Missing Key ❌</span>", unsafe_allow_html=True)
         st.info("API features will remain locked until a valid key is added.")

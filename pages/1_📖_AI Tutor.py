@@ -35,12 +35,6 @@ st.markdown("<p class='subtitle'>Engage in conversational question-answering or 
 
 # 2. Validate configuration (e.g., API key presence)
 api_key_valid = True
-try:
-    validate_config()
-except ValueError as e:
-    api_key_valid = False
-    st.warning("⚠️ Configuration Alert: Google Gemini API Key is missing.")
-    st.info("Please navigate to the ⚙️ Settings page or sidebar to configure your credentials.")
 
 # 3. Retrieve user documents
 user_docs = get_user_documents(user_id)
@@ -232,7 +226,7 @@ if api_key_valid:
                     
         with tab_notes:
             st.write("### Compile Structured Review Notes")
-            st.write("Let Gemini analyze the entire document and compile a structured, detailed study guide including definitions, summary points, and takeaways.")
+            st.write("Let Azure OpenAI analyze the entire document and compile a structured, detailed study guide including definitions, summary points, and takeaways.")
             
             if st.button("Create & Save Notes", key="btn_notes", use_container_width=True):
                 with st.spinner("Analyzing document and creating summary notes..."):

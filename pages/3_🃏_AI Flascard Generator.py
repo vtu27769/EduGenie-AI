@@ -41,8 +41,8 @@ try:
     validate_config()
 except ValueError as e:
     api_key_valid = False
-    st.warning("⚠️ Configuration Alert: Google Gemini API Key is missing.")
-    st.info("Please navigate to the ⚙️ Settings page or sidebar to configure your credentials.")
+    st.warning("")
+    
 
 # Retrieve user documents
 user_docs = get_user_documents(user_id)
@@ -131,7 +131,7 @@ if api_key_valid:
                 key="flashcard_count_slider"
             )
             
-            if st.button("✨ Generate Flashcards using Gemini", key="btn_generate_cards", use_container_width=True):
+            if st.button("✨ Generate Flashcards using Azure OpenAI", key="btn_generate_cards", use_container_width=True):
                 with st.spinner("Analyzing document content and crafting flashcards..."):
                     try:
                         count = pipeline.generate_and_save_flashcards(user_id, active_doc_name, num_cards)

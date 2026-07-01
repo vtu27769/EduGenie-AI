@@ -8,6 +8,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH)
+print("BASE_DIR =", BASE_DIR)
+print("ENV_PATH =", ENV_PATH)
+print("AZURE_OPENAI_ENDPOINT =", bool(os.getenv("AZURE_OPENAI_ENDPOINT")))
+print("AZURE_OPENAI_API_KEY =", bool(os.getenv("AZURE_OPENAI_API_KEY")))
+print("AZURE_OPENAI_DEPLOYMENT =", bool(os.getenv("AZURE_OPENAI_DEPLOYMENT")))
 
 # Define directories for project data
 DATA_DIR = BASE_DIR / "data"
@@ -23,19 +28,20 @@ try:
 except Exception as e:
     raise IOError(f"Failed to create necessary project directories: {e}")
 
-# Retrieve Google Gemini API Key
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+# Retrieve Azure OpenAI Credentials
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
+AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 
-def validate_config() -> None:
-    """
-    Validates that essential configurations and API keys are set.
-    Raises ValueError if required configurations are missing.
-    """
-    api_key = os.getenv("GOOGLE_API_KEY") or GOOGLE_API_KEY
-    if not api_key or api_key == "YOUR_GEMINI_API_KEY" or not api_key.strip():
+def validate_config():
+    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    api_key = os.getenv("AZURE_OPENAI_API_KEY")
+    deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+    api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+    if not endpoint or not api_key or not deployment or not api_version:
         raise ValueError(
-            "GOOGLE_API_KEY is not set in the environment or .env file. "
-            "Please obtain an API key from Google AI Studio and configure it."
+            "Azure OpenAI configuration is incomplete."
         )
 
 

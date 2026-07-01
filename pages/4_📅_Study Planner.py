@@ -17,11 +17,12 @@ st.set_page_config(
 
 st.title("📅 AI Study Planner")
 
-if "user" not in st.session_state:
-    st.warning("Please login first.")
-    st.stop()
+from src.utils.auth_helper import require_login
 
-user_id = st.session_state["user"]["id"]
+require_login()
+
+user_id = st.session_state.user_id
+username = st.session_state.username
 
 tab1, tab2 = st.tabs(
     ["➕ Create Plan", "📚 Saved Plans"]

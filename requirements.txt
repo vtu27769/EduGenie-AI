@@ -1,12 +1,15 @@
 streamlit>=1.35.0
 langchain>=0.2.0
 langchain-community>=0.2.0
+langchain-openai>=0.1.0
 langchain-chroma>=0.1.0
 langchain-huggingface>=0.0.1
-langchain-google-genai>=1.0.0
+
 chromadb>=0.5.0
 sentence-transformers>=3.0.0
+
 streamlit-cookies-controller
+
 sqlalchemy>=2.0.0
 python-dotenv>=1.0.1
 pypdf>=4.2.0
@@ -14,3 +17,5 @@ python-docx>=1.1.2
 pydantic>=2.7.0
 bcrypt>=4.1.0
 pandas>=2.2.0
+
+openai>=1.0.0

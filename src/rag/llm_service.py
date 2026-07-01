@@ -30,36 +30,34 @@ class FlashcardsListSchema(BaseModel):
 
 class LLMService:
     """
-    Service layer for communicating with Google Gemini using LangChain.
+    Service layer for communicating with  Azure OpenAI using LangChain.
     """
-    def __init__(self, temperature: float = 0.2):
+    
+    def __init__(self):
+        pass
+    def _get_llm(self):
         """
-        Initializes the service with temperature setting. LLM client is generated lazily.
+        Creates Azure OpenAI client.
         """
-        self.temperature = temperature
-        logger.info("LLMService initialized with lazy client creation.")
-
-     def _get_llm(self):
-    """
-    Creates Azure OpenAI client.
-    """
 
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         api_key = os.getenv("AZURE_OPENAI_API_KEY")
+        deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        api_version = os.getenv("AZURE_OPENAI_API_VERSION")
 
-        if not endpoint or not api_key:
+        if not endpoint or not api_key or not deployment or not api_version:
             raise ValueError(
-                "Azure OpenAI credentials not configured."
-    
-                )
+                "Azure OpenAI configuration is incomplete."
+            )
+
 
         return AzureChatOpenAI(
             azure_endpoint=endpoint,
             api_key=api_key,
-            deployment_name="gpt-5-mini",
-            temperature=self.temperature
-    )
-
+            api_version=api_version,
+            deployment_name=deployment,
+            
+        )
     def generate_answer(self, question: str, context: str) -> str:
         """
         Generates an answer to a question based on the provided document context.
@@ -167,7 +165,7 @@ class LLMService:
             logger.error(f"Error generating quiz fallback: {e}", exc_info=True)
             raise RuntimeError(f"Failed to generate quiz: {str(e)}")
 
-    def generate_quiz_structured(self, context: str, num_questions: int = 5) -> QuizSchema:
+    def generate_quiz_structured(self, context: str, num_questions: int = 5) -> QuieSchema:
         """
         Generates a structured Pydantic QuizSchema object from the provided context.
         """
@@ -202,13 +200,13 @@ class LLMService:
 
     def generate_flashcards_structured(self, context: str, num_cards: int = 10) -> FlashcardsListSchema:
         """
-        Generates structured flashcards from the provided context using Gemini.
+        Generates structured flashcards from the provided context using Azure OpenAI.
         """
         if not context.strip():
             raise ValueError("Context cannot be empty for flashcard generation.")
 
         try:
-            logger.info(f"Generating {num_cards} structured flashcards using Gemini structured output...")
+            logger.info(f"Generating {num_cards} structured flashcards using Azure OpenAI structured output...")
             llm = self._get_llm()
             
             # Request structured output using langchain interface

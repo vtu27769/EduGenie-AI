@@ -13,9 +13,6 @@ from src.database.db_manager import (
 
 require_login()
 
-if st.session_state.get("role") != "admin":
-    st.error("⛔ Access Denied")
-    st.stop()
 
 st.title("🛡️ Admin Dashboard")
 

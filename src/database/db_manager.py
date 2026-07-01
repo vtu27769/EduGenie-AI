@@ -12,6 +12,7 @@ def get_db_connection():
     Establishes and returns a connection to the SQLite database.
     """
     try:
+        print("SQLITE_DB_PATH =", SQLITE_DB_PATH)
         conn = sqlite3.connect(SQLITE_DB_PATH)
         conn.row_factory = sqlite3.Row
         # Enable foreign keys
@@ -213,8 +214,8 @@ def register_user(username: str, password: str, security_question: str, security
         conn.commit()
         conn.close()
         return True
-    except sqlite3.IntegrityError:
-        logger.warning(f"Registration failed: username '{username}' already exists.")
+    except sqlite3.IntegrityError as e:
+        logger.error(f"SQLite IntegrityError: {e}")
         return False
     except Exception as e:
         logger.error(f"Registration error: {e}", exc_info=True)
@@ -232,10 +233,12 @@ def authenticate_user(username: str, password: str) -> dict:
             (username.strip(),)
    )
         row = cursor.fetchone()
+        print("DB ROW:", row)
+        print("PASSWORD OK:", check_password(password, row['password_hash']) if row else "NO USER")
         conn.close()
-        
+
         if row and check_password(password, row['password_hash']):
-            return {"id": row['id'], "username": row['username'], "role": row.get("role", "user")}
+            return {"id": row['id'], "username": row['username']}
         return None
     except Exception as e:
         logger.error(f"Auth error: {e}", exc_info=True)
