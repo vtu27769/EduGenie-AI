@@ -13,6 +13,7 @@ def init_auth():
         st.session_state.logged_in = False
         st.session_state.user_id = None
         st.session_state.username = None
+        st.session_state.role = "user"
 
     if not st.session_state.logged_in:
         try:
@@ -25,7 +26,7 @@ def init_auth():
                     st.session_state.logged_in = True
                     st.session_state.user_id = user["id"]
                     st.session_state.username = user["username"]
-                    
+                    st.session_state.role = user.get("role", "user")
                     # Lazy init RAGPipeline if needed
                     from src.rag.pipeline import RAGPipeline
                     if "pipeline" not in st.session_state:
@@ -73,6 +74,7 @@ def logout_user():
     st.session_state.logged_in = False
     st.session_state.user_id = None
     st.session_state.username = None
+    st.session_state.role = None
     if "pipeline" in st.session_state:
         del st.session_state["pipeline"]
     if "active_document_name" in st.session_state:

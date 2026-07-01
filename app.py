@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 # Initialize database schema
 init_db()
-
+from src.database.db_manager import create_default_admin
+create_default_admin()
 # Configure page settings
 st.set_page_config(
     page_title="EduGenie AI - Intelligent Study Dashboard",
@@ -68,7 +69,7 @@ if not st.session_state.logged_in:
                             st.session_state.logged_in = True
                             st.session_state.user_id = user["id"]
                             st.session_state.username = user["username"]
-                            
+                            st.session_state.role = user.get("role", "user")
                             # Initialize RAG pipeline
                             from src.rag.pipeline import RAGPipeline
                             if "pipeline" not in st.session_state:
@@ -386,7 +387,9 @@ else:
     with st.sidebar:
         st.image("https://img.icons8.com/clouds/200/genie.png", width=100)
         st.markdown(f"## EduGenie Dashboard")
+        role = st.session_state.get("role", "user")
         st.markdown(f"👤 **User:** `{username}`")
+        st.markdown(f"🛡️ **Role:** `{role}`")
         
         # Display Active Document
         active_doc = st.session_state.get("active_document_name")

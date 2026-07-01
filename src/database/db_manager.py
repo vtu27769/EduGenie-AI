@@ -37,6 +37,7 @@ def init_db():
                 password_hash TEXT NOT NULL,
                 security_question TEXT NOT NULL,
                 security_answer_hash TEXT NOT NULL,
+                role TEXT DEFAULT 'user',
                 remember_token TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -186,9 +187,21 @@ def register_user(username: str, password: str, security_question: str, security
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO users (username, password_hash, security_question, security_answer_hash)
-            VALUES (?, ?, ?, ?)
-        """, (username.strip(), hashed_pwd, security_question.strip(), hashed_ans))
+            INSERT INTO users (
+                username,
+                password_hash,
+                security_question,
+                security_answer_hash,
+                role
+          )
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            username.strip(),
+            hashed_pwd,
+            security_question.strip(),
+            hashed_ans,
+            "user"
+   ))
         user_id = cursor.lastrowid
         
         # Initialize gamification for new user
@@ -214,17 +227,58 @@ def authenticate_user(username: str, password: str) -> dict:
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, username, password_hash FROM users WHERE username = ?", (username.strip(),))
+        cursor.execute(
+            "SELECT id, username, password_hash, role FROM users WHERE username = ?",
+            (username.strip(),)
+   )
         row = cursor.fetchone()
         conn.close()
         
         if row and check_password(password, row['password_hash']):
-            return {"id": row['id'], "username": row['username']}
+            return {"id": row['id'], "username": row['username'], "role": row.get("role", "user")}
         return None
     except Exception as e:
         logger.error(f"Auth error: {e}", exc_info=True)
         return None
+def create_default_admin():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
+        cursor.execute(
+            "SELECT id FROM users WHERE username = ?",
+            ("admin",)
+        )
+
+        existing = cursor.fetchone()
+
+        if not existing:
+            admin_password = hash_password("admin123")
+            admin_answer = hash_password("admin")
+
+            cursor.execute("""
+                INSERT INTO users (
+                    username,
+                    password_hash,
+                    security_question,
+                    security_answer_hash,
+                    role
+                )
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                "admin",
+                admin_password,
+                "Admin Account",
+                admin_answer,
+                "admin"
+            ))
+
+            conn.commit()
+
+        conn.close()
+
+    except Exception as e:
+        logger.error(f"Admin creation failed: {e}")
 def get_user_by_id(user_id: int) -> dict:
     """
     Retrieves user record by ID.
@@ -726,3 +780,57 @@ def delete_all_flashcards(user_id: int, document_name: str) -> bool:
     except Exception as e:
         logger.error(f"Delete all flashcards failed: {e}", exc_info=True)
         return False
+def get_total_users():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users")
+    total = cursor.fetchone()[0]
+    conn.close()
+    return total
+
+
+def get_total_documents():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM uploaded_documents")
+    total = cursor.fetchone()[0]
+    conn.close()
+    return total
+
+
+def get_total_notes():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM notes_history")
+    total = cursor.fetchone()[0]
+    conn.close()
+    return total
+
+
+def get_total_quizzes():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM quiz_history")
+    total = cursor.fetchone()[0]
+    conn.close()
+    return total
+
+
+def get_all_users():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            username,
+            role,
+            created_at
+        FROM users
+        ORDER BY created_at DESC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [dict(row) for row in rows]
